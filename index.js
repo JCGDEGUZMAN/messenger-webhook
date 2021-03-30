@@ -1,10 +1,21 @@
 'use strict';
 
+// Use dotenv to read .env vars into Node
+require('dotenv').config();
+
 // Imports dependencies and set up http server
 const
+  request = require('request'),
   express = require('express'),
   bodyParser = require('body-parser'),
-  app = express().use(bodyParser.json()); // creates express http server
+  { urlencoded, json } = require('body-parser'),
+  app = express(); // creates express http server
+
+//Parse application/x-www-form-urlencoded
+app.use(urlencoded({ extended: true }));
+
+// Parse application/json
+app.use(json());
 
 // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
@@ -45,8 +56,8 @@ function callSendAPI(sender_psid, response) {
     "message": response
   }
 
-   // Send the HTTP request to the Messenger Platform
-   request({
+  // Send the HTTP request to the Messenger Platform
+  request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
     "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
     "method": "POST",
@@ -102,8 +113,8 @@ app.post('/webhook', (req, res) => {
 app.get('/webhook', (req, res) => {
 
   // Your verify token. Should be a random string.
-  let VERIFY_TOKEN = "1a2b3c4d";
- 
+  let VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
