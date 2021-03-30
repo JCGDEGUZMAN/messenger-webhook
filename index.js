@@ -3,13 +3,16 @@
 // Use dotenv to read .env vars into Node
 require('dotenv').config();
 
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+
 // Imports dependencies and set up http server
 const
   request = require('request'),
   express = require('express'),
-  bodyParser = require('body-parser'),
   { urlencoded, json } = require('body-parser'),
-  app = express(); // creates express http server
+  
+app = express(); // creates express http server
 
 //Parse application/x-www-form-urlencoded
 app.use(urlencoded({ extended: true }));
@@ -33,7 +36,7 @@ function handleMessage(sender_psid, received_message) {
 
     // Create the payload for a basic text message
     response = {
-      "text": `You sent the message: "${received_message.text}". Now send me an image!`
+      "text": `You sent the message: "${received_message.text}". Thank You!`
     }
   }  
   
@@ -59,7 +62,7 @@ function callSendAPI(sender_psid, response) {
   // Send the HTTP request to the Messenger Platform
   request({
     "uri": "https://graph.facebook.com/v2.6/me/messages",
-    "qs": { "access_token": process.env.PAGE_ACCESS_TOKEN },
+    "qs": { "access_token": PAGE_ACCESS_TOKEN },
     "method": "POST",
     "json": request_body
   }, (err, res, body) => {
@@ -111,9 +114,6 @@ app.post('/webhook', (req, res) => {
 
 // Adds support for GET requests to our webhook
 app.get('/webhook', (req, res) => {
-
-  // Your verify token. Should be a random string.
-  let VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
   // Parse the query params
   let mode = req.query['hub.mode'];
